@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="rootWrapper">
     <h1 class="title">Tính điểm team</h1>
     <div class="sub-title">by @tqcong</div>
 
@@ -26,6 +26,7 @@
             ref="scoreInputRef"
             class="score-input"
             type="number"
+            @keydown="handleKeyDownScoreBox"
             v-model="selectedItem.scores[index]"
           />
           <button
@@ -48,6 +49,8 @@
         <div class="total-value">{{ getTotalScore(selectedItem) }}</div>
       </div>
     </div>
+    <div class="team-wrapper" v-else></div>
+
     <div class="buttons" v-else>
       <button id="addTeamButton" class="button-icon" @click="addTeam()">
         + Thêm đội
@@ -245,22 +248,34 @@ async function showResult() {
 
   popupResultRef.value.focus();
 }
+
+function handleKeyDownScoreBox(event) {
+  if (event.key == 'Enter') {
+    event.stopPropagation();
+    addScore(selectedItem.value)
+  }
+}
 </script>
 
 <style scoped>
-.read-the-docs {
-  color: #888;
-}
+.rootWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+} 
 
 .team-wrapper {
-  /*box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,
-    rgb(209, 213, 219) 0px 0px 0px 1px inset;*/
   border-radius: 4px;
   padding: 12px;
 
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  flex:1;
+
+  overflow-y: scroll;
 }
 
 .team-title-wrapper {
@@ -302,9 +317,6 @@ async function showResult() {
 }
 
 .navbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
   width: 100%;
   padding: 12px;
   background-color: #333;
