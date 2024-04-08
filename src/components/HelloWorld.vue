@@ -301,6 +301,7 @@ function handleKeyDownScoreBox(event) {
   padding: 12px;
   background-color: #333;
   color: #fff;
+  flex-shrink: 0;
 }
 
 .navbar .list {
