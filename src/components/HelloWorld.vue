@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { localStorageUtil } from '../utils/local-storage-util.js';
 
 const teams = ref([]);
@@ -108,11 +108,22 @@ onMounted(() => {
   selectedItem.value = getFirstItem();
 
   window.addEventListener('beforeunload', handleUnloadPage);
+  window.addEventListener("visibilitychange", saveTeamsToLs);
 });
 
-function handleUnloadPage() {
-  localStorageUtil.setItem(lsKey, teams.value);
+onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleUnloadPage);
+  window.removeEventListener("visibilitychange", saveTeamsToLs);
+})
+
+function handleUnloadPage() {
+  saveTeamsToLs();
+  window.removeEventListener('beforeunload', handleUnloadPage);
+  window.removeEventListener("visibilitychange", saveTeamsToLs);
+}
+
+function saveTeamsToLs() {
+  localStorageUtil.setItem(lsKey, teams.value);
 }
 
 const teamNameInputRef = ref([]);
