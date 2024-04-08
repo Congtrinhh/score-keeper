@@ -5,41 +5,22 @@
 
     <div class="team-wrapper" v-if="selectedItem">
       <div class="team-title-wrapper">
-        <input
-          ref="teamNameInputRef"
-          class="team-name-input"
-          type="text"
-          v-model="selectedItem.name"
-          placeholder="Nhập tên đội"
-        />
-        <button
-          class="delete-team-button button"
-          @click="deleteTeam(selectedItem.id)"
-        >
+        <input ref="teamNameInputRef" class="team-name-input" type="text" v-model="selectedItem.name"
+          placeholder="Nhập tên đội" />
+        <button class="delete-team-button button" @click="deleteTeam(selectedItem.id)">
           Xóa đội
         </button>
       </div>
 
       <div class="list-score">
         <div class="score-item" v-for="(_, index) in selectedItem.scores">
-          <input
-            ref="scoreInputRef"
-            class="score-input"
-            type="number"
-            @keydown="handleKeyDownScoreBox"
-            v-model="selectedItem.scores[index]"
-          />
-          <button
-            class="delete-score-button button button-icon"
-            @click="deleteScore(selectedItem.id, index)"
-          >
+          <input ref="scoreInputRef" class="score-input" type="number" @keydown="handleKeyDownScoreBox"
+            v-model="selectedItem.scores[index]" />
+          <button class="delete-score-button button button-icon" @click="deleteScore(selectedItem.id, index)">
             &times;
           </button>
         </div>
-        <button
-          class="add-score-button button-icon"
-          @click="addScore(selectedItem)"
-        >
+        <button class="add-score-button button-icon" @click="addScore(selectedItem)">
           +
         </button>
       </div>
@@ -49,9 +30,10 @@
         <div class="total-value">{{ getTotalScore(selectedItem) }}</div>
       </div>
     </div>
-    <div class="team-wrapper" v-else></div>
-
-    <div class="buttons" v-else>
+    <div v-else :class="{
+      buttons: true,
+      emptyItemState: !selectedItem
+    }">
       <button id="addTeamButton" class="button-icon" @click="addTeam()">
         + Thêm đội
       </button>
@@ -59,17 +41,12 @@
 
     <nav class="navbar">
       <div class="list">
-        <div
-          :class="[
-            'list-item col-4',
-            {
-              active: team.id === selectedItem?.id,
-            },
-          ]"
-          v-for="team in teams"
-          :key="team.id"
-          @click="switchTab(team)"
-        >
+        <div :class="[
+      'list-item col-4',
+      {
+        active: team.id === selectedItem?.id,
+      },
+    ]" v-for="team in teams" :key="team.id" @click="switchTab(team)">
           <div class="child">
             <div class="team-name" :title="team.name">
               {{ team.name || 'Đội mới' }}
@@ -117,8 +94,9 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, nextTick, onMounted } from 'vue';
 import { localStorageUtil } from '../utils/local-storage-util.js';
+
 const teams = ref([]);
 const lsKey = 'tqcong_items';
 
@@ -263,7 +241,7 @@ function handleKeyDownScoreBox(event) {
   flex-direction: column;
   width: 100vw;
   height: 100vh;
-} 
+}
 
 .team-wrapper {
   border-radius: 4px;
@@ -273,7 +251,7 @@ function handleKeyDownScoreBox(event) {
   flex-direction: column;
   gap: 12px;
 
-  flex:1;
+  flex: 1;
 
   overflow-y: scroll;
 }
@@ -282,6 +260,7 @@ function handleKeyDownScoreBox(event) {
   display: flex;
   gap: 8px;
 }
+
 .team-title-wrapper .team-name-input {
   font-size: 1.2rem;
   font-weight: bold;
@@ -312,6 +291,7 @@ function handleKeyDownScoreBox(event) {
 .summary-wrapper .label {
   font-weight: 500;
 }
+
 .summary-wrapper .total-value {
   font-weight: bold;
 }
@@ -342,6 +322,7 @@ function handleKeyDownScoreBox(event) {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
 .navbar .list-item .team-score {
   font-weight: bold;
 }
@@ -381,6 +362,7 @@ h1.title {
   font-weight: 500;
   margin-bottom: 6px;
 }
+
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -394,6 +376,7 @@ h1.title {
   align-items: center;
   transform: translateY(-10%);
 }
+
 .popup-result {
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
@@ -406,6 +389,7 @@ h1.title {
   width: 80vw;
   max-width: 480px;
 }
+
 .popup-header {
   display: flex;
   justify-content: space-between;
@@ -423,5 +407,13 @@ h1.title {
 
 .button-icon {
   font-size: 1.2rem;
+}
+
+.emptyItemState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-20%);
 }
 </style>
