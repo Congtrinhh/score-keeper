@@ -29,13 +29,16 @@
             v-model="selectedItem.scores[index]"
           />
           <button
-            class="delete-score-button button"
+            class="delete-score-button button button-icon"
             @click="deleteScore(selectedItem.id, index)"
           >
             &times;
           </button>
         </div>
-        <button class="add-score-button" @click="addScore(selectedItem)">
+        <button
+          class="add-score-button button-icon"
+          @click="addScore(selectedItem)"
+        >
           +
         </button>
       </div>
@@ -46,7 +49,9 @@
       </div>
     </div>
     <div class="buttons" v-else>
-      <button id="addTeamButton" @click="addTeam()">+ Thêm đội</button>
+      <button id="addTeamButton" class="button-icon" @click="addTeam()">
+        + Thêm đội
+      </button>
     </div>
 
     <nav class="navbar">
@@ -72,7 +77,9 @@
       </div>
 
       <div class="buttons">
-        <button id="addTeamButton" @click="addTeam()">+</button>
+        <button id="addTeamButton" class="button-icon" @click="addTeam()">
+          +
+        </button>
       </div>
       <hr />
       <div class="action-buttons">
@@ -109,22 +116,23 @@
 <script setup>
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { localStorageUtil } from '../utils/local-storage-util.js';
-
 const teams = ref([]);
-const lsKey = 'items';
+const lsKey = 'tqcong_items';
 
 onMounted(() => {
   const itemsFromLs = localStorageUtil.getItem(lsKey);
   if (itemsFromLs) {
     teams.value = itemsFromLs;
   }
-
   selectedItem.value = getFirstItem();
+
+  window.addEventListener('beforeunload', handleUnloadPage);
 });
 
-onBeforeUnmount(() => {
+function handleUnloadPage() {
   localStorageUtil.setItem(lsKey, teams.value);
-});
+  window.removeEventListener('beforeunload', handleUnloadPage);
+}
 
 const teamNameInputRef = ref([]);
 
@@ -145,7 +153,7 @@ async function addTeam() {
   const newTeam = {
     id: id,
     name: '',
-    scores: [0],
+    scores: [null],
   };
   teams.value.push(newTeam);
 
@@ -188,9 +196,12 @@ function deleteScore(id, scoreIndex) {
 
 const selectedItem = ref(null);
 
-function switchTab(team) {
+function switchTab(team, hasFocus = false) {
   selectedItem.value = team;
-  teamNameInputRef.value.focus();
+
+  if (hasFocus) {
+    teamNameInputRef.value.focus();
+  }
 }
 
 async function clearAll() {
@@ -260,6 +271,7 @@ async function showResult() {
   font-size: 1.2rem;
   font-weight: bold;
   max-width: 100%;
+  padding: 8px;
 }
 
 .list-score {
@@ -395,5 +407,9 @@ h1.title {
 .popup-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+.button-icon {
+  font-size: 1.2rem;
 }
 </style>
